@@ -51,12 +51,3 @@ target_link_libraries(qserl-tests
     )
 
 include(CMakeUnitTests.txt)
-
-add_custom_command(TARGET qserl-tests POST_BUILD
-    COMMAND qserl-tests
-    --log_level=test_suite
-    --result_code=no
-    --report_level=confirm
-    --detect_memory_leak=1
-    )
-
