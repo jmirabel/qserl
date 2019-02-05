@@ -18,6 +18,7 @@
 cmake_minimum_required(VERSION 3.5)
 include(cmake/base.cmake)
 include(cmake/eigen.cmake)
+INCLUDE(GNUInstallDirs)
 
 project(libqserl VERSION 1.1.0 LANGUAGES CXX)
 if(NOT ${CMAKE_VERSION} VERSION_GREATER 3.8)
@@ -32,6 +33,11 @@ option(QSERL_BUILD_SHARED "Build shared libraries" ON)
 
 # Option for building tests
 option(QSERL_BUILD_TEST "Build tests" OFF)
+
+option(QSERL_GENERATE_DOCUMENTATION "Generate documentation" OFF)
+IF(QSERL_GENERATE_DOCUMENTATION)
+  _SETUP_PROJECT_DOCUMENTATION()
+ENDIF()
 
 #------------------------------------------------------------------------------
 # Dependencies
