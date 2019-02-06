@@ -30,6 +30,11 @@
 #include "costate_system.h"
 #include "jacobian_system.h"
 
+#define CHRONO
+#ifdef CHRONO
+#include <chrono>
+#endif
+
 namespace qserl {
 namespace rod3d {
 
@@ -135,6 +140,9 @@ WorkspaceIntegratedState::integrate()
 WorkspaceIntegratedState::IntegrationResultT
 WorkspaceIntegratedState::integrateFromBaseWrenchRK4(const Wrench& i_wrench)
 {
+#ifdef CHRONO
+  auto t0 = std::chrono::high_resolution_clock::now();
+#endif
 
   static const double ktstart = 0.;                          // Start integration time
   const double ktend = m_rodParameters.integrationTime;      // End integration time
@@ -148,6 +156,9 @@ WorkspaceIntegratedState::integrateFromBaseWrenchRK4(const Wrench& i_wrench)
     return IR_SINGULAR;
   }
 
+#ifdef CHRONO
+  auto t1 = std::chrono::high_resolution_clock::now();
+#endif
   // 1. solve the costate system to find mu
   const Eigen::Matrix<double, 6, 1>& stiffnessCoefficients = m_rodParameters.stiffnessCoefficients;
   const Eigen::Matrix<double, 6, 1> invStiffness = stiffnessCoefficients.cwiseInverse();
@@ -185,6 +196,9 @@ WorkspaceIntegratedState::integrateFromBaseWrenchRK4(const Wrench& i_wrench)
     (*mu_buffer)[step_idx] = mu_t;
   }
 
+#ifdef CHRONO
+  auto t2 = std::chrono::high_resolution_clock::now();
+#endif
   // 2. solve the state system to find q
   StateSystem state_system(invStiffness, dt, *mu_buffer, m_rodParameters.rodModel);
   boost::numeric::odeint::runge_kutta4<state_type> sss_stepper;
@@ -280,6 +294,10 @@ WorkspaceIntegratedState::integrateFromBaseWrenchRK4(const Wrench& i_wrench)
     }
   }
 
+#ifdef CHRONO
+  auto t4 = std::chrono::high_resolution_clock::now();
+#endif
+
   // compute J nu part singular values
   if((!m_integrationOptions.stop_if_unstable || m_isStable) && m_integrationOptions.computeJ_nu_sv)
   {
@@ -310,6 +328,16 @@ WorkspaceIntegratedState::integrateFromBaseWrenchRK4(const Wrench& i_wrench)
   {
     delete J_buffer;
   }
+
+#ifdef CHRONO
+  auto t5 = std::chrono::high_resolution_clock::now();
+  std::cout << (t1-t0).count()
+    << '\t' << (t2-t1).count()
+    << '\t' << (t3-t2).count()
+    << '\t' << (t4-t3).count()
+    << '\t' << (t5-t4).count()
+    << std::endl;
+#endif
 
   if(!m_isStable)
   {
