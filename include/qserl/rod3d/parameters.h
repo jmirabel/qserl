@@ -34,7 +34,6 @@ struct QSERL_EXPORT Parameters
 {
   Parameters() :
       radius(0.01),
-      length(1.),
       stiffnessCoefficients(Eigen::Matrix<double, 6, 1>::Ones()),
       //density(1.1 * 10e3),   /** 1.10 kg/dm3 -> kg/m3, */
       rodModel(RM_EXTENSIBLE_SHEARABLE),
@@ -88,13 +87,12 @@ struct QSERL_EXPORT Parameters
    * Attributes
    */
   double                        radius;
-  double                        length;
   Eigen::Matrix<double, 6, 1>   stiffnessCoefficients;
   RodModelT                     rodModel;
   int                           numNodes;       /** Number of discretization nodes. Related to the delta_t field
                                                   * used for 2D rod by delta_t = 1 / (numNodes - 1) */
-  /**< Internal use only. */
-  double                        integrationTime;  /**< Should be kept to 1 (default value). */
+  /** Set the cable length (default to 1). */
+  double                        integrationTime;
 };
 
 }  // namespace rod3d

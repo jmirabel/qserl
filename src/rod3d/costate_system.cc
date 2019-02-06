@@ -32,10 +32,8 @@ CostateSystem::defaultState()
 }
 
 CostateSystem::CostateSystem(const Eigen::Matrix<double, 6, 1>& i_inv_stiffness,
-                             double i_length,
                              Parameters::RodModelT i_rodModel) :
     m_inv_c(i_inv_stiffness),
-    m_length(i_length),
     m_rodModel(i_rodModel)
 {
   using namespace std::placeholders;

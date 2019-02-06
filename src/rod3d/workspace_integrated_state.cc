@@ -151,7 +151,7 @@ WorkspaceIntegratedState::integrateFromBaseWrenchRK4(const Wrench& i_wrench)
   // 1. solve the costate system to find mu
   const Eigen::Matrix<double, 6, 1>& stiffnessCoefficients = m_rodParameters.stiffnessCoefficients;
   const Eigen::Matrix<double, 6, 1> invStiffness = stiffnessCoefficients.cwiseInverse();
-  CostateSystem costate_system(invStiffness, m_rodParameters.length, m_rodParameters.rodModel);
+  CostateSystem costate_system(invStiffness, m_rodParameters.rodModel);
 
   costate_type mu_t;
   // init mu(0) = a					(base DLO wrench)
@@ -186,7 +186,7 @@ WorkspaceIntegratedState::integrateFromBaseWrenchRK4(const Wrench& i_wrench)
   }
 
   // 2. solve the state system to find q
-  StateSystem state_system(invStiffness, m_rodParameters.length, dt, *mu_buffer, m_rodParameters.rodModel);
+  StateSystem state_system(invStiffness, dt, *mu_buffer, m_rodParameters.rodModel);
   boost::numeric::odeint::runge_kutta4<state_type> sss_stepper;
   std::vector<state_type> q_array(m_numNodes, StateSystem::defaultState());
 

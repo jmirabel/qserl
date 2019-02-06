@@ -32,14 +32,12 @@ StateSystem::defaultState()
 }
 
 StateSystem::StateSystem(const Eigen::Matrix<double, 6, 1>& i_inv_stiffness,
-                         double i_length,
                          double i_dt,
                          const std::vector<WorkspaceIntegratedState::costate_type>& i_mu,
                          Parameters::RodModelT i_rodModel) :
     m_inv_c(i_inv_stiffness),
     m_dt(i_dt),
     m_mu(i_mu),
-    m_length(i_length),
     m_rodModel(i_rodModel)
 {
   assert (m_dt > 0. && "integration step time must be positive.");

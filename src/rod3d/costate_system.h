@@ -37,7 +37,6 @@ public:
   * Constructors, destructors
   */
   CostateSystem(const Eigen::Matrix<double, 6, 1>& i_inv_stiffness,
-                double i_length,
                 Parameters::RodModelT i_rodModel);
 
   virtual ~CostateSystem();
@@ -54,7 +53,6 @@ public:
 private:
 
   Eigen::Matrix<double, 6, 1>               m_inv_c;    /**< Inverse stiffness coefficients */
-  double                                    m_length;
   Parameters::RodModelT                     m_rodModel;
 
   std::function<void(const state_type&,

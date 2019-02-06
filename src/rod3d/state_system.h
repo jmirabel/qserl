@@ -38,7 +38,6 @@ public:
   * Constructors, destructors
   */
   StateSystem(const Eigen::Matrix<double, 6, 1>& i_inv_stiffness,
-              double i_length,
               double i_dt,
               const std::vector<WorkspaceIntegratedState::costate_type>& i_mu,
               Parameters::RodModelT i_rodModel);
@@ -59,7 +58,6 @@ private:
   Eigen::Matrix<double, 6, 1> m_inv_c;      /**< Inverse stiffness coefficients */
   double m_dt;
   const std::vector<WorkspaceIntegratedState::costate_type>& m_mu;
-  double m_length;
   Parameters::RodModelT m_rodModel;
 
   std::function<void(const state_type&,
