@@ -188,27 +188,24 @@ WorkspaceIntegratedState::integrateFromBaseWrenchRK4(const Wrench& i_wrench)
   // 2. solve the state system to find q
   StateSystem state_system(invStiffness, dt, *mu_buffer, m_rodParameters.rodModel);
   boost::numeric::odeint::runge_kutta4<state_type> sss_stepper;
-  std::vector<state_type> q_array(m_numNodes, StateSystem::defaultState());
+  m_nodes.resize(m_numNodes);
 
   // init q_0 to identity
   state_type q_t;
   Eigen::Matrix4d::Map(q_t.data()).setIdentity();
-  q_array[0] = q_t;      // store q_0
+  m_nodes[0].setIdentity();
 
   step_idx = 1;
   for(double t = ktstart; step_idx < m_numNodes; ++step_idx, t += dt)
   {
     sss_stepper.do_step(state_system, q_t, t, dt);
-    q_array[step_idx] = q_t;
+    const Eigen::Map<const Eigen::Matrix4d> q_e(q_t.data());
+    m_nodes[step_idx] = q_e;
   }
 
-  // update state
-  m_nodes.assign(q_array.size(), Displacement::Identity());
-  for(size_t i = 0; i < q_array.size(); ++i)
-  {
-    const Eigen::Map<const Eigen::Matrix4d> q_e(q_array[i].data());
-    m_nodes[i] = Displacement(q_e);
-  }
+#ifdef CHRONO
+  auto t3 = std::chrono::high_resolution_clock::now();
+#endif
 
   // 3. Solve the jacobian system (and check non-degenerescence of matrix J)
   JacobianSystem jacobianSystem(invStiffness, dt, *mu_buffer, m_rodParameters.rodModel);
