@@ -85,17 +85,19 @@ JacobianSystem::evaluateInextensible(const state_type& i_MJ,
                                      state_type& o_dMJdt,
                                      double i_t)
 {
+  using Eigen::Vector3d;
+
   const size_t k = static_cast<size_t>(i_t / m_dt);
   assert (k < m_mu.size() && "Given mu values array not consistent with current integration parameters.");
 
   const WorkspaceIntegratedState::costate_type& mu_k = m_mu[k];
 
   // pre-compute u
-  const Eigen::Map<const Eigen::Matrix<double, 3, 1> > mu_k_e(mu_k.data());
-  const Eigen::Matrix<double, 3, 1> u = mu_k_e.cwiseProduct(m_inv_c.block<3, 1>(0, 0));
+  const Eigen::Map<const Vector3d > mu_k_e(mu_k.data());
+  const Vector3d u = mu_k_e.cwiseProduct(m_inv_c.block<3, 1>(0, 0));
 
   // F matrix
-  Eigen::Matrix<double, 6, 6> F;
+  Matrix6d F;
   F << 0., mu_k[2] * m_b[0], mu_k[1] * m_b[0], 0., 0., 0.,
       mu_k[2] * m_b[1], 0, mu_k[0] * m_b[1], 0., 0., 1.,
       mu_k[1] * m_b[2], mu_k[0] * m_b[2], 0., 0., -1., 0.,
@@ -104,8 +106,7 @@ JacobianSystem::evaluateInextensible(const state_type& i_MJ,
       -mu_k[4] * m_inv_c[0], mu_k[3] * m_inv_c[1], 0, u[1], -u[0], 0.;
 
   // G matrix
-  Eigen::Matrix<double, 6, 6> G;
-  G.setZero();
+  Eigen::DiagonalMatrix<double, 6> G;
   G.diagonal() << m_inv_c[0], m_inv_c[1], m_inv_c[2], 0, 0, 0;
 
   // H matrix
@@ -118,12 +119,12 @@ JacobianSystem::evaluateInextensible(const state_type& i_MJ,
       0, -1, 0, u[1], -u[0], 0;
 
   // create mapping between mj array and M & J eigen matrices
-  const Eigen::Map<const Eigen::Matrix<double, 6, 6> > M_e(i_MJ.data());
-  const Eigen::Map<const Eigen::Matrix<double, 6, 6> > J_e(i_MJ.data() + 36);
+  const Eigen::Map<const Matrix6d> M_e(i_MJ.data());
+  const Eigen::Map<const Matrix6d> J_e(i_MJ.data() + 36);
 
   // create mapping between dmjdt array and dMdt & dJdt eigen matrices
-  Eigen::Map<Eigen::Matrix<double, 6, 6> > dMdt_e(o_dMJdt.data());
-  Eigen::Map<Eigen::Matrix<double, 6, 6> > dJdt_e(o_dMJdt.data() + 36);
+  Eigen::Map<Matrix6d> dMdt_e(o_dMJdt.data());
+  Eigen::Map<Matrix6d> dJdt_e(o_dMJdt.data() + 36);
 
   dMdt_e = F * M_e;
   dJdt_e = G * M_e + H * J_e;

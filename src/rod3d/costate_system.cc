@@ -67,13 +67,14 @@ CostateSystem::evaluateInextensible(const state_type& i_mu,
                                     state_type& o_dmudt,
                                     double /*i_t*/)
 {
-  static const Eigen::Matrix<double, 3, 1> ke_1 = Eigen::Matrix3d::Identity().col(0);
-  const Eigen::Map<const Eigen::Matrix<double, 3, 1> > m_e(i_mu.data());
-  const Eigen::Map<const Eigen::Matrix<double, 3, 1> > f_e(i_mu.data() + 3);
-  const Eigen::Matrix<double, 3, 1> u = m_e.cwiseProduct(m_inv_c.block<3, 1>(0, 0));
+  using Eigen::Vector3d;
+  static const Vector3d ke_1 (1,0,0);
+  const Eigen::Map<const Vector3d> m_e(i_mu.data());
+  const Eigen::Map<const Vector3d> f_e(i_mu.data() + 3);
+  const Vector3d u = m_e.cwiseProduct(m_inv_c.head<3>());
 
-  Eigen::Map<Eigen::Matrix<double, 3, 1> > dmdt_e(o_dmudt.data());
-  Eigen::Map<Eigen::Matrix<double, 3, 1> > dfdt_e(o_dmudt.data() + 3);
+  Eigen::Map<Vector3d> dmdt_e(o_dmudt.data());
+  Eigen::Map<Vector3d> dfdt_e(o_dmudt.data() + 3);
 
   dmdt_e = -u.cross(m_e) - (ke_1).cross(f_e);
   dfdt_e = -u.cross(f_e);
