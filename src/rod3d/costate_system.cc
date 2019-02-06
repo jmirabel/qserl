@@ -71,7 +71,7 @@ CostateSystem::evaluateInextensible(const state_type& i_mu,
   static const Vector3d ke_1 (1,0,0);
   const Eigen::Map<const Vector3d> m_e(i_mu.data());
   const Eigen::Map<const Vector3d> f_e(i_mu.data() + 3);
-  const Vector3d u = m_e.cwiseProduct(m_inv_c.head<3>());
+  const Vector3d u (m_e.cwiseProduct(m_inv_c.head<3>()));
 
   Eigen::Map<Vector3d> dmdt_e(o_dmudt.data());
   Eigen::Map<Vector3d> dfdt_e(o_dmudt.data() + 3);

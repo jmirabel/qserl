@@ -79,7 +79,7 @@ StateSystem::evaluateInextensible(const state_type& i_q,
 
   // pre-compute u, coefficients of ODEs
   const Eigen::Map<const Eigen::Vector3d> mu_k_e(mu_k.data());
-  const Eigen::Vector3d u = mu_k_e.cwiseProduct(m_inv_c.head<3>());
+  const Eigen::Vector3d u (mu_k_e.cwiseProduct(m_inv_c.head<3>()));
 
   Eigen::Matrix4d u_hat_h;
   u_hat_h << 0, -u[2], u[1], 1.,

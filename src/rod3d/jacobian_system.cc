@@ -94,7 +94,7 @@ JacobianSystem::evaluateInextensible(const state_type& i_MJ,
 
   // pre-compute u
   const Eigen::Map<const Vector3d > mu_k_e(mu_k.data());
-  const Vector3d u = mu_k_e.cwiseProduct(m_inv_c.block<3, 1>(0, 0));
+  const Vector3d u = mu_k_e.cwiseProduct(m_inv_c.head<3>());
 
   // F matrix
   Matrix6d F;

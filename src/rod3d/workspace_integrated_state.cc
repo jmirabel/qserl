@@ -256,6 +256,8 @@ WorkspaceIntegratedState::integrateFromBaseWrenchRK4(const Wrench& i_wrench)
   }
   J_det_buffer->assign(m_numNodes, 0.);
 
+  Eigen::PartialPivLU<Matrix6d> decomposition (6);
+
   for(double t = ktstart; step_idx < m_numNodes && (!m_integrationOptions.stop_if_unstable || m_isStable);
       ++step_idx, t += dt)
   {
@@ -264,7 +266,8 @@ WorkspaceIntegratedState::integrateFromBaseWrenchRK4(const Wrench& i_wrench)
     (*J_buffer)[step_idx] = Eigen::Map<Eigen::Matrix<double, 6, 6> >(jacobian_t.data() + 36);
     // check if stable
     double& J_det = (*J_det_buffer)[step_idx];
-    J_det = (*J_buffer)[step_idx].determinant();
+    decomposition.compute ((*J_buffer)[step_idx]);
+    J_det = decomposition.determinant();
     if(abs(J_det) > JacobianSystem::kStabilityThreshold)
     {
       isThresholdOn = true;
