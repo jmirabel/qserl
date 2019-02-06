@@ -254,7 +254,8 @@ WorkspaceIntegratedState::integrateFromBaseWrenchRK4(const Wrench& i_wrench)
   {
     J_det_buffer = new std::vector<double>();
   }
-  J_det_buffer->assign(m_numNodes, 0.);
+  J_det_buffer->resize(m_numNodes);
+  J_det_buffer->at(0) = 0;
 
   Eigen::PartialPivLU<Matrix6d> decomposition (6);
 
@@ -273,7 +274,7 @@ WorkspaceIntegratedState::integrateFromBaseWrenchRK4(const Wrench& i_wrench)
       isThresholdOn = true;
     }
     if(isThresholdOn && (abs(J_det) < JacobianSystem::kStabilityTolerance ||
-                         J_det * (*J_det_buffer)[step_idx - 1] < 0.))
+                         std::signbit(J_det) != std::signbit(J_det_buffer->at(step_idx-1))))
     {  // zero crossing
       m_isStable = false;
     }
